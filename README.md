@@ -141,4 +141,4 @@ El modelo `ProductoView` calcula automáticamente el estado:
 
 ### 4. Logs de Consola (Arquitectura Limpia)
 Evidencia de la traza de ejecución de Spring Boot. Demuestra que el flujo de dependencias respeta los límites arquitectónicos (de afuera hacia adentro, sin saltarse las capas del dominio) y confirma la correcta ejecución de los adaptadores de persistencia (JPA/Hibernate) al guardar el `Aggregate Root`.
-![Logs Consola](img/Logs_consola.png)
+![Logs Consola](img/logs.png)
