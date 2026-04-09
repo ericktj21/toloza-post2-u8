@@ -6,117 +6,6 @@ Sistema de Gestión de Inventario implementando el patrón **CQRS (Command Query
 
 Este proyecto demuestra la implementación completa del patrón CQRS, separando explícitamente el stack de **escritura** (CommandHandlers) del stack de **lectura** (QueryHandlers). El objetivo es evidenciar cómo CQRS permite optimizar independientemente los modelos de lectura y escritura.
 
-### Stack de Escritura (Commands)
-- **AgregarProductoCommand**: Crear nuevos productos
-- **ActualizarStockCommand**: Modificar el stock de inventario
-- **EliminarProductoCommand**: Eliminar productos
-- Utiliza la entidad de dominio `Producto` con lógica de negocio completa
-
-### Stack de Lectura (Queries)
-- **BuscarProductoQuery**: Consultar un producto específico
-- **ListarProductosQuery**: Listar todos los productos con filtros
-- Utiliza el modelo optimizado `ProductoView` (DTO) para presentación
-
-## 🏗️ Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    REST Controller                          │
-├───────────────────────┬─────────────────────────────────────┤
-│    COMANDO (POST/     │        QUERY (GET)                  │
-│    PATCH/DELETE)      │                                     │
-├───────────────────────┼─────────────────────────────────────┤
-│  CommandHandlers      │      QueryHandlers                  │
-│  - AgregarProducto    │  - BuscarProducto                   │
-│  - ActualizarStock    │  - ListarProductos                  │
-│  - EliminarProducto   │                                     │
-├───────────────────────┼─────────────────────────────────────┤
-│ Dominio (Lógica)      │  Modelo Lectura (Presentación)     │
-│ - Producto            │  - ProductoView                     │
-│ - ProductoId          │  - calcularEstado()                 │
-│ - Validaciones        │                                     │
-├───────────────────────┼─────────────────────────────────────┤
-│  WriteRepository      │     ReadRepository                  │
-│  (JPA)                │     (JPA)                           │
-├───────────────────────┴─────────────────────────────────────┤
-│              Base de Datos (H2 In-Memory)                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## 🚀 Requisitos
-
-- **Java**: JDK 17 o superior
-- **Maven**: 3.8+
-- **Spring Boot**: 3.2.0
-- **Dependencias**:
-  - Spring Web
-  - Spring Data JPA
-  - H2 Database
-  - Validation
-
-## 📦 Estructura de Carpetas
-
-```
-toloza-post2-u8/
-├── pom.xml
-├── README.md
-├── src/main/java/com/example/inventariocqrs/
-│   ├── InventarioCqrsApplication.java
-│   ├── domain/
-│   │   ├── Producto.java               ← Entidad de dominio
-│   │   ├── ProductoId.java             ← Value Object
-│   │   ├── ProductoNotFoundException.java
-│   │   └── StockInsuficienteException.java
-│   ├── command/
-│   │   ├── AgregarProductoCommand.java
-│   │   ├── ActualizarStockCommand.java
-│   │   ├── EliminarProductoCommand.java
-│   │   ├── handler/
-│   │   │   ├── AgregarProductoHandler.java
-│   │   │   ├── ActualizarStockHandler.java
-│   │   │   └── EliminarProductoHandler.java
-│   │   └── repository/
-│   │       └── ProductoWriteRepository.java
-│   ├── query/
-│   │   ├── BuscarProductoQuery.java
-│   │   ├── ListarProductosQuery.java
-│   │   ├── handler/
-│   │   │   ├── BuscarProductoQueryHandler.java
-│   │   │   └── ListarProductosQueryHandler.java
-│   │   ├── model/
-│   │   │   └── ProductoView.java
-│   │   └── repository/
-│   │       └── ProductoReadRepository.java
-│   └── adapter/
-│       ├── web/
-│       │   └── ProductoController.java
-│       └── exception/
-│           └── GlobalExceptionHandler.java
-└── src/main/resources/
-    └── application.properties
-```
-
-## 🔧 Cómo Ejecutar
-
-### 1. Compilar el proyecto
-```bash
-mvn clean compile
-```
-
-### 2. Crear el JAR ejecutable
-```bash
-mvn package -DskipTests
-```
-
-### 3. Ejecutar la aplicación
-```bash
-java -jar target/inventario-cqrs-1.0.0.jar
-```
-
-La aplicación estará disponible en: **http://localhost:8081**
-
-## 🧪 Endpoints de API
-
 ### COMANDO: Crear Producto
 ```bash
 POST /api/inventario/productos
@@ -217,7 +106,7 @@ GET /api/inventario/productos/{id}
 }
 ```
 
-## ⚠️ Errores Posibles
+## Errores Posibles
 
 ### Stock Insuficiente
 ```bash
@@ -250,47 +139,6 @@ El modelo `ProductoView` calcula automáticamente el estado:
 - **BAJO**: 0 < stock < 5
 - **AGOTADO**: stock == 0
 
-## 🔑 Características Principales de CQRS
-
-✅ **Separación clara**: Commands y Queries en paquetes diferentes
-✅ **Responsabilidad única**: Cada handler tiene un único propósito
-✅ **Lógica de dominio**: Concentrada en la entidad `Producto`
-✅ **Modelo optimizado**: `ProductoView` para presentación eficiente
-✅ **Manejo de excepciones**: GlobalExceptionHandler con respuestas HTTP apropiad
-✅ **Inmutabilidad**: Comandos y Queries son records (inmutables)
-✅ **Validación**: Reglas de negocio en el dominio
-
-## 💾 Base de Datos
-
-Se utiliza **H2 In-Memory** para este laboratorio:
-- **URL**: `jdbc:h2:mem:testdb`
-- **Usuario**: `sa`
-- **Contraseña**: (vacía)
-- **Consola H2**: http://localhost:8081/h2-console
-
-## 📊 Commits del Proyecto
-
-1. **Commit 1**: Estructura Maven base y configuración Spring Boot
-2. **Commit 2**: Domain layer - Producto entity con lógica de negocio
-3. **Commit 3**: Command side - Comandos y handlers
-4. **Commit 4**: Query side - Queries, handlers y modelo de lectura
-5. **Commit 5**: REST controller - Orquestación de comandos y consultas
-6. **Commit 6**: Fix - Corregir import en Producto.java
-7. **Commit 7**: Exception handler - Manejo global de excepciones
-
-## ✨ Conclusiones
-
-Este proyecto implementa CQRS demostrando:
-
-1. **Separación de intereses**: El stack de escritura y lectura son completamente independientes
-2. **Escalabilidad**: Cada lado puede optimizarse según su propósito
-3. **Mantenibilidad**: El código es más organizado y fácil de entender
-4. **Testabilidad**: Cada componente (handler, command, query) es fácil de probar
-
-El patrón CQRS es especialmente útil en sistemas complejos donde los modelos de lectura y escritura tienen requisitos muy diferentes.
-
----
-
-**Autor**: Ingeniería de Sistemas 2026  
-**Patrón**: CQRS (Command Query Responsibility Segregation)  
-**Tecnologías**: Java 17, Spring Boot 3.2, Maven, H2
+### 4. Logs de Consola (Arquitectura Limpia)
+Evidencia de la traza de ejecución de Spring Boot. Demuestra que el flujo de dependencias respeta los límites arquitectónicos (de afuera hacia adentro, sin saltarse las capas del dominio) y confirma la correcta ejecución de los adaptadores de persistencia (JPA/Hibernate) al guardar el `Aggregate Root`.
+![Logs Consola](img/logs_consola.png)
