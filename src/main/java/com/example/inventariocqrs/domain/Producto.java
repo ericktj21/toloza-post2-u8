@@ -2,7 +2,6 @@ package com.example.inventariocqrs.domain;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.objects.requireNonNull;
 import java.util.Objects;
 
 /**
